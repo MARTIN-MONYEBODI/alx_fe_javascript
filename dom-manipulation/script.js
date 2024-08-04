@@ -71,7 +71,7 @@ async function addQuote() {
     alert("New quote added successfully!");
 
     // Sync with the server after adding a new quote
-    await syncWithServer();
+    await syncQuotes();
 
     // Post the new quote to the server
     await postQuoteToServer(newQuote);
@@ -138,7 +138,7 @@ function initializeQuoteList() {
     loadQuotes();
     populateCategories();
     updateQuoteList();
-    syncWithServer(); // Sync with the server when the page loads
+    syncQuotes(); // Sync with the server when the page loads
 }
 
 // Function to fetch quotes from the server
@@ -157,16 +157,6 @@ async function fetchQuotesFromServer() {
     } catch (error) {
         console.error('Error fetching quotes from server:', error);
     }
-}
-
-// Function to sync quotes with the server
-async function syncWithServer() {
-    await fetchQuotesFromServer();
-
-    // Optionally, you can implement periodic sync
-    setInterval(async () => {
-        await fetchQuotesFromServer();
-    }, 60000); // Sync every 60 seconds
 }
 
 // Function to post a new quote to the server
@@ -189,6 +179,16 @@ async function postQuoteToServer(quote) {
     } catch (error) {
         console.error('Error posting quote to the server:', error);
     }
+}
+
+// Function to sync quotes with the server
+async function syncQuotes() {
+    await fetchQuotesFromServer();
+
+    // Optionally, you can implement periodic sync
+    setInterval(async () => {
+        await fetchQuotesFromServer();
+    }, 60000); // Sync every 60 seconds
 }
 
 // Function to display last viewed quote on page load if available
