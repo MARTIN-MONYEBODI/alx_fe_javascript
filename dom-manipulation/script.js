@@ -27,7 +27,11 @@ function saveQuotes() {
 function populateCategories() {
     const categoryFilter = document.getElementById('categoryFilter');
     categoryFilter.innerHTML = '<option value="all">All Categories</option>'; // Reset categories
-    categories.forEach(category => {
+
+    // Use map to get all categories and then create a unique set
+    const uniqueCategories = [...new Set(quotes.map(quote => quote.category))];
+
+    uniqueCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
@@ -135,3 +139,29 @@ function importFromJsonFile(event) {
     };
     fileReader.readAsText(event.target.files[0]);
 }
+
+// Initialize the quote list on page load
+function initializeQuoteList() {
+    loadQuotes();
+    populateCategories();
+    updateQuoteList();
+}
+
+// Event listeners
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+document.getElementById('addQuoteButton').addEventListener('click', addQuote);
+document.getElementById('exportQuotes').addEventListener('click', exportQuotes);
+document.getElementById('importFile').addEventListener('change', importFromJsonFile);
+
+// Initialize the quote list when the page loads
+initializeQuoteList();
+
+// Display last viewed quote on page load if available
+window.onload = function() {
+    const lastQuote = sessionStorage.getItem('lastQuote');
+    if (lastQuote) {
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        const quote = JSON.parse(lastQuote);
+        quoteDisplay.textContent = `"${quote.text}" - ${quote.category}`;
+    }
+};
