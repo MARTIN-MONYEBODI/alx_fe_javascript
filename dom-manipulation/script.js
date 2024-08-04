@@ -138,28 +138,30 @@ function initializeQuoteList() {
 }
 
 // Function to fetch quotes from the server
-function fetchQuotesFromServer() {
-    fetch(SERVER_URL)
-        .then(response => response.json())
-        .then(serverQuotes => {
-            // Merge server quotes with local quotes
-            const newQuotes = serverQuotes.filter(sq => !quotes.some(lq => lq.text === sq.text));
-            quotes.push(...newQuotes);
-            newQuotes.forEach(quote => categories.add(quote.category));
-            saveQuotes();
-            populateCategories();
-            updateQuoteList();
-        })
-        .catch(error => console.error('Error fetching quotes from server:', error));
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(SERVER_URL);
+        const serverQuotes = await response.json();
+
+        // Merge server quotes with local quotes
+        const newQuotes = serverQuotes.filter(sq => !quotes.some(lq => lq.text === sq.text));
+        quotes.push(...newQuotes);
+        newQuotes.forEach(quote => categories.add(quote.category));
+        saveQuotes();
+        populateCategories();
+        updateQuoteList();
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
 }
 
 // Function to sync quotes with the server
-function syncWithServer() {
-    fetchQuotesFromServer();
+async function syncWithServer() {
+    await fetchQuotesFromServer();
 
     // Optionally, you can implement periodic sync
-    setInterval(() => {
-        fetchQuotesFromServer();
+    setInterval(async () => {
+        await fetchQuotesFromServer();
     }, 60000); // Sync every 60 seconds
 }
 
