@@ -9,11 +9,11 @@ document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 //function to display a random quote
 function showRandomQuote() {
     const quoteDisplay = document.getElementById('quoteDisplay');
-    quoteDisplay.textContent = quotes.length ? ' ' : "No quotes";
+    quoteDisplay.innerHTML = quotes.length ? ' ' : "No quotes";
 
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
-    quoteDisplay.textContent = `"${randomQuote.text}" - ${randomQuote.category}`;
+    quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
 
 }
 
