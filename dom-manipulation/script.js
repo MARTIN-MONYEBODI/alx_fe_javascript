@@ -154,6 +154,7 @@ async function fetchQuotesFromServer() {
         saveQuotes();
         populateCategories();
         updateQuoteList();
+        displayNotification('Quotes synced with server!');
     } catch (error) {
         console.error('Error fetching quotes from server:', error);
     }
@@ -200,6 +201,18 @@ window.onload = function() {
         quoteDisplay.textContent = `"${quote.text}" - ${quote.category}`;
     }
 };
+
+// Function to display notifications
+function displayNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 3000); // Display for 3 seconds
+}
 
 // Event listeners
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
