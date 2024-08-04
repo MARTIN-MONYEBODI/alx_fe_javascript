@@ -36,3 +36,12 @@ function createAddQuoteForm() {
     alert("New quote added successfully!");
 }
 
+//Adding Quotes
+function initializeQuoteList() {
+    const quoteListContainer = document.createElement('div');
+    quoteListContainer.id = 'quoteList';
+    document.body.appendChild(quoteListContainer);
+}
+
+initializeQuoteList();
+
