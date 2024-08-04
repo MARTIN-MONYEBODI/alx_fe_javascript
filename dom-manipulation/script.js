@@ -76,7 +76,10 @@ function exportQuotes() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'quotes.json';
+    a.textContent = "Export Quotes"; // Ensure the button label is "Export Quotes"
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
@@ -117,4 +120,3 @@ window.onload = function() {
         quoteDisplay.textContent = `"${quote.text}" - ${quote.category}`;
     }
 };
-
