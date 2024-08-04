@@ -1,5 +1,6 @@
 let quotes = [];
 let categories = new Set();
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
 // Load quotes and categories from local storage if available
 function loadQuotes() {
@@ -8,13 +9,7 @@ function loadQuotes() {
         quotes = JSON.parse(savedQuotes);
         quotes.forEach(quote => categories.add(quote.category));
     } else {
-        // Default quotes if no local storage found
-        quotes = [
-            { text: "He who has a WHY to live for can bear almost any HOW.", category: "Motivation" },
-            { text: "You cannot control what happens to you in life, but you can always control what you will feel and do about what happens to you.", category: "Philosophical" }
-        ];
-        quotes.forEach(quote => categories.add(quote.category));
-        saveQuotes();
+        quotes = [];
     }
 }
 
@@ -28,7 +23,6 @@ function populateCategories() {
     const categoryFilter = document.getElementById('categoryFilter');
     categoryFilter.innerHTML = '<option value="all">All Categories</option>'; // Reset categories
 
-    // Use map to get all categories and then create a unique set
     const uniqueCategories = [...new Set(quotes.map(quote => quote.category))];
 
     uniqueCategories.forEach(category => {
@@ -38,7 +32,6 @@ function populateCategories() {
         categoryFilter.appendChild(option);
     });
 
-    // Set the selected category from local storage if available
     const selectedCategory = localStorage.getItem('selectedCategory');
     if (selectedCategory) {
         categoryFilter.value = selectedCategory;
@@ -73,15 +66,11 @@ function addQuote() {
     categories.add(newQuoteCategory);
     saveQuotes();
     populateCategories();
-
-    // Clear the input fields
-    document.getElementById('newQuoteText').value = "";
-    document.getElementById('newQuoteCategory').value = "";
-
-    // Update the quote list in the DOM
     updateQuoteList();
 
     alert("New quote added successfully!");
+
+    syncWithServer(); // Sync with the server after adding a new quote
 }
 
 // Update the quote list in the DOM
@@ -145,7 +134,44 @@ function initializeQuoteList() {
     loadQuotes();
     populateCategories();
     updateQuoteList();
+    syncWithServer(); // Sync with the server when the page loads
 }
+
+// Function to fetch quotes from the server
+function fetchQuotesFromServer() {
+    fetch(SERVER_URL)
+        .then(response => response.json())
+        .then(serverQuotes => {
+            // Merge server quotes with local quotes
+            const newQuotes = serverQuotes.filter(sq => !quotes.some(lq => lq.text === sq.text));
+            quotes.push(...newQuotes);
+            newQuotes.forEach(quote => categories.add(quote.category));
+            saveQuotes();
+            populateCategories();
+            updateQuoteList();
+        })
+        .catch(error => console.error('Error fetching quotes from server:', error));
+}
+
+// Function to sync quotes with the server
+function syncWithServer() {
+    fetchQuotesFromServer();
+
+    // Optionally, you can implement periodic sync
+    setInterval(() => {
+        fetchQuotesFromServer();
+    }, 60000); // Sync every 60 seconds
+}
+
+// Function to display last viewed quote on page load if available
+window.onload = function() {
+    const lastQuote = sessionStorage.getItem('lastQuote');
+    if (lastQuote) {
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        const quote = JSON.parse(lastQuote);
+        quoteDisplay.textContent = `"${quote.text}" - ${quote.category}`;
+    }
+};
 
 // Event listeners
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
@@ -155,13 +181,3 @@ document.getElementById('importFile').addEventListener('change', importFromJsonF
 
 // Initialize the quote list when the page loads
 initializeQuoteList();
-
-// Display last viewed quote on page load if available
-window.onload = function() {
-    const lastQuote = sessionStorage.getItem('lastQuote');
-    if (lastQuote) {
-        const quoteDisplay = document.getElementById('quoteDisplay');
-        const quote = JSON.parse(lastQuote);
-        quoteDisplay.textContent = `"${quote.text}" - ${quote.category}`;
-    }
-};
