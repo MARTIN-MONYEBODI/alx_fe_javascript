@@ -52,7 +52,7 @@ function showRandomQuote() {
 }
 
 // Function to add a new quote
-function addQuote() {
+async function addQuote() {
     const newQuoteText = document.getElementById('newQuoteText').value;
     const newQuoteCategory = document.getElementById('newQuoteCategory').value;
 
@@ -70,7 +70,11 @@ function addQuote() {
 
     alert("New quote added successfully!");
 
-    syncWithServer(); // Sync with the server after adding a new quote
+    // Sync with the server after adding a new quote
+    await syncWithServer();
+
+    // Post the new quote to the server
+    await postQuoteToServer(newQuote);
 }
 
 // Update the quote list in the DOM
@@ -163,6 +167,28 @@ async function syncWithServer() {
     setInterval(async () => {
         await fetchQuotesFromServer();
     }, 60000); // Sync every 60 seconds
+}
+
+// Function to post a new quote to the server
+async function postQuoteToServer(quote) {
+    try {
+        const response = await fetch(SERVER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quote)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to post the quote to the server');
+        }
+
+        const postedQuote = await response.json();
+        console.log('Quote posted to the server:', postedQuote);
+    } catch (error) {
+        console.error('Error posting quote to the server:', error);
+    }
 }
 
 // Function to display last viewed quote on page load if available
